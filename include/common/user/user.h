@@ -55,4 +55,6 @@ void showUserMenu(int userRole);
 
 int getMerchantName(int merchantId, char *merchantName);
 
+void rechargeAccount(int userId);
+
 #endif //ECOMMERCESYSTEM_USER_H

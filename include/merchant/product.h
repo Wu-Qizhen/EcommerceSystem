@@ -69,4 +69,16 @@ int unactiveProduct(int productId);
 
 int toggleProductStatus(int productId);
 
+void browseProductsByCategory(void);
+
+void browseProductsByPrice(void);
+
+void searchProductsForClient(void);
+
+void viewProductDetailsForClient(void);
+
+void displayProductsForClient(Product result[], int count);
+
+void displayProductDetailsForClient(const Product *product);
+
 #endif //ECOMMERCESYSTEM_PRODUCT_H

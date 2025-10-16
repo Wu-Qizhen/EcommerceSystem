@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "client_menu.h"
 #include "user/user.h"
 #include "merchant/merchant_main.h"
 #include "utils/print_util.h"
@@ -41,7 +42,7 @@ void loginUser(const int role) {
         currentUser = &users[userIndex];
         if (role == USER_ROLE_CONSUMER) {
             printSuccess("客户端登录成功！");
-            // TODO 商品系统
+            clientSys(currentUser->id);
         } else if (role == USER_ROLE_MERCHANT) {
             printSuccess("商家端登录成功！");
             merchantSys(currentUser->id);

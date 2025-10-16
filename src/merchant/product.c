@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "discount.h"
 #include "security/validation.h"
 #include "user/user.h"
 #include "utils/control_util.h"
@@ -815,4 +816,278 @@ int toggleProductStatus(const int productId) {
     products[index].isActive = !products[index].isActive;
     saveProducts();
     return products[index].isActive;
+}
+
+void browseProductsByCategory(void) {
+    printHeader("按分类浏览");
+    printf("电商商城 > 浏览商品 > 按分类浏览\n");
+    printSubLine();
+
+    char categories[MAX_PRODUCTS][MAX_CATEGORY_LEN];
+    int categoryCount = 0;
+
+    for (int i = 0; i < productCount; i++) {
+        if (products[i].isActive && !products[i].isDeleted) {
+            int found = 0;
+            for (int j = 0; j < categoryCount; j++) {
+                if (strcmp(categories[j], products[i].category) == 0) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                strcpy(categories[categoryCount], products[i].category);
+                categoryCount++;
+            }
+        }
+    }
+
+    if (categoryCount == 0) {
+        printWarning("暂无商品分类！");
+        return;
+    }
+
+    printf("可用分类：\n");
+    for (int i = 0; i < categoryCount; i++) {
+        printf("%d. %s\n", i + 1, categories[i]);
+    }
+
+    printSubLine();
+    int choice;
+    printf("请选择分类（输入 0 返回）：");
+    if (scanf_s("%d", &choice) != 1) {
+        printError("输入格式错误！");
+        return;
+    }
+
+    if (choice == 0) return;
+
+    if (choice < 1 || choice > categoryCount) {
+        printError("无效选择！");
+        return;
+    }
+
+    char selectedCategory[MAX_CATEGORY_LEN];
+    strcpy(selectedCategory, categories[choice - 1]);
+
+    Product result[MAX_PRODUCTS];
+    int count = 0;
+
+    for (int i = 0; i < productCount; i++) {
+        if (products[i].isActive && !products[i].isDeleted &&
+            strcmp(products[i].category, selectedCategory) == 0) {
+            result[count++] = products[i];
+        }
+    }
+
+    printHeader("分类商品");
+    printf("电商商城 > 浏览商品 > 按分类浏览 > %s\n", selectedCategory);
+    printSubLine();
+    displayProductsForClient(result, count);
+    printSubLine();
+    pauseScreen();
+}
+
+void browseProductsByPrice(void) {
+    printHeader("按价格排序");
+    printf("电商商城 > 浏览商品 > 按价格排序\n");
+    printSubLine();
+
+    int choice;
+    printf("排序方式：\n");
+    printf("1. 从低到高\n");
+    printf("2. 从高到低\n");
+    printf("0. 返回\n");
+    printSubLine();
+    printInputHint();
+
+    if (scanf_s("%d", &choice) != 1) {
+        printError("输入格式错误！");
+        return;
+    }
+
+    if (choice == 0) return;
+
+    if (choice != 1 && choice != 2) {
+        printError("无效选择！");
+        return;
+    }
+
+    Product result[MAX_PRODUCTS];
+    int count = 0;
+
+    for (int i = 0; i < productCount; i++) {
+        if (products[i].isActive && !products[i].isDeleted) {
+            result[count++] = products[i];
+        }
+    }
+
+    if (count == 0) {
+        printWarning("暂无商品！");
+        return;
+    }
+
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            int shouldSwap = 0;
+            if (choice == 1) {
+                shouldSwap = result[j].price > result[j + 1].price;
+            } else {
+                shouldSwap = result[j].price < result[j + 1].price;
+            }
+
+            if (shouldSwap) {
+                Product temp = result[j];
+                result[j] = result[j + 1];
+                result[j + 1] = temp;
+            }
+        }
+    }
+
+    printHeader("排序结果");
+    printf("电商商城 > 浏览商品 > 按价格排序\n");
+    printSubLine();
+    displayProductsForClient(result, count);
+    printSubLine();
+    pauseScreen();
+}
+
+void searchProductsForClient(void) {
+    printHeader("搜索商品");
+    printf("电商商城 > 浏览商品 > 搜索商品\n");
+    printSubLine();
+
+    char keyword[MAX_NAME_LEN];
+    printf("请输入搜索关键词：");
+    scanf_s("%49s", keyword, (unsigned) sizeof(keyword));
+
+    Product result[MAX_PRODUCTS];
+    const int count = searchProducts(keyword, result, MAX_PRODUCTS);
+
+    if (count > 0) {
+        printHeader("搜索结果");
+        printf("电商商城 > 浏览商品 > 搜索商品 > 搜索结果\n");
+        printSubLine();
+        displayProductsForClient(result, count);
+        printf("\n找到 %d 个相关商品：\n", count);
+        printSubLine();
+        pauseScreen();
+    } else {
+        printWarning("未找到相关商品！");
+    }
+}
+
+void viewProductDetailsForClient(void) {
+    printHeader("查看商品详情");
+    printf("电商商城 > 浏览商品 > 查看商品详情\n");
+    printSubLine();
+
+    int productId;
+    printf("请输入商品ID：");
+    if (scanf_s("%d", &productId) != 1) {
+        printError("输入格式错误！");
+        return;
+    }
+
+    int index = findProductById(productId);
+    if (index == -1 || !products[index].isActive || products[index].isDeleted) {
+        printError("商品不存在或已下架！");
+        return;
+    }
+
+    displayProductDetailsForClient(&products[index]);
+    printSubLine();
+    pauseScreen();
+}
+
+void displayProductsForClient(Product result[], const int count) {
+    if (count == 0) {
+        printf("暂无商品\n");
+        return;
+    }
+
+    const int idWidth = 8;
+    const int nameWidth = 20;
+    const int categoryWidth = 16;
+    const int priceWidth = 10;
+    const int stockWidth = 8;
+    const int merchantWidth = 16;
+
+    printPadded("ID", idWidth);
+    printPadded("名称", nameWidth);
+    printPadded("分类", categoryWidth);
+    printPadded("价格", priceWidth);
+    printPadded("库存", stockWidth);
+    printPadded("商家", merchantWidth);
+    printf("\n");
+    printSubLine();
+
+    for (int i = 0; i < count; i++) {
+        char idStr[20];
+        sprintf(idStr, "%d", result[i].id);
+        printPadded(idStr, idWidth);
+
+        printPadded(result[i].name, nameWidth);
+        printPadded(result[i].category, categoryWidth);
+
+        char priceStr[20];
+        sprintf(priceStr, "¥%.2f", result[i].price);
+        printPadded(priceStr, priceWidth);
+
+        char stockStr[20];
+        if (result[i].stock > 10) {
+            sprintf(stockStr, "%d", result[i].stock);
+        } else {
+            sprintf(stockStr, "⚠️%d", result[i].stock);
+        }
+        printPadded(stockStr, stockWidth);
+
+        char merchantName[MAX_NAME_LEN];
+        if (getMerchantName(result[i].merchantId, merchantName) > 0) {
+            printPadded(merchantName, merchantWidth);
+        } else {
+            printPadded("未知", merchantWidth);
+        }
+
+        printf("\n");
+    }
+
+    printf("\n共有 %d 件商品！\n", count);
+}
+
+void displayProductDetailsForClient(const Product *product) {
+    if (product == NULL) {
+        printError("商品信息为空！");
+        return;
+    }
+
+    printHeader("商品信息");
+    printf("电商商城 > 浏览商品 > 商品信息\n");
+    printSubLine();
+
+    printf("商品 ID：%d\n", product->id);
+    printf("商品名称：%s\n", product->name);
+    printf("商品分类：%s\n", product->category);
+    printf("商品描述：%s\n", product->description);
+    printf("商品价格：¥%.2f\n", product->price);
+    printf("商品库存：%d\n", product->stock);
+
+    char merchantName[MAX_NAME_LEN];
+    if (getMerchantName(product->merchantId, merchantName) > 0) {
+        printf("商家名称：%s\n", merchantName);
+    }
+
+    Discount merchantDiscounts[MAX_DISCOUNTS];
+    const int merchantDiscountsCount = findActiveDiscountsByMerchantId(product->merchantId, merchantDiscounts);
+
+    if (merchantDiscountsCount > 0) {
+        printf("优惠活动：\n");
+        for (int i = 0; i < merchantDiscountsCount; i++) {
+            const double discountedPrice = calculateDiscountedPrice(product->price, &merchantDiscounts[i]);
+            if (discountedPrice < product->price) {
+                printf("  - %s: ¥%.2f → ¥%.2f\n",
+                       merchantDiscounts[i].name, product->price, discountedPrice);
+            }
+        }
+    }
 }

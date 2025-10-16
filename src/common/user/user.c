@@ -195,3 +195,41 @@ int getMerchantName(const int merchantId, char *merchantName) {
     }
     return -1;
 }
+
+void rechargeAccount(const int userId) {
+    printHeader("充值账户");
+    printf("商品概览 > 用户信息 > 充值账户\n");
+    printSubLine();
+
+    /*if (userId < 0 || userId >= userCount) {
+        printError("无效的用户 ID！");
+        return;
+    }*/
+
+    printf("请输入充值金额：");
+    double amount;
+
+    if (scanf_s("%lf", &amount) != 1) {
+        printError("输入格式错误！");
+        while (getchar() != '\n') {
+        }
+        return;
+    }
+
+    if (amount <= 0) {
+        printError("充值金额必须大于 0！");
+        return;
+    }
+
+    if (users[userId].balance + amount > 999999.99) {
+        printError("充值后余额超出最大限制！");
+        return;
+    }
+
+    users[userId].balance += amount;
+    currentUser->balance += amount;
+    saveUsers();
+    printf("充值金额：¥%.2f\n", amount);
+    printf("当前余额：¥%.2f\n", users[userId].balance);
+    printSuccess("充值成功！");
+}
