@@ -93,7 +93,7 @@ void displayCurrentUserInfo(const int userRole) {
         printf("商品概览 > 商家信息 > 查看信息\n");
     } else {
         printHeader("查看信息");
-        printf("商品概览 > 用户信息 > 查看信息\n"); // TODO
+        printf("电商商城 > 用户信息 > 查看信息\n");
     }
 
     printSubLine();
@@ -113,7 +113,7 @@ void changePassword(const int userRole) {
         printf("商品概览 > 商家信息 > 修改密码\n");
     } else {
         printHeader("修改密码");
-        printf("商品概览 > 用户信息 > 修改密码\n"); // TODO
+        printf("电商商城 > 用户信息 > 修改密码\n");
     }
 
     printSubLine();
@@ -159,7 +159,7 @@ void showUserMenu(const int userRole) {
             printf("商品概览 > 商家信息\n");
         } else {
             printHeader("用户信息");
-            printf("商品概览 > 用户信息\n"); // TODO
+            printf("电商商城 > 用户信息\n");
         }
 
         printSubLine();
