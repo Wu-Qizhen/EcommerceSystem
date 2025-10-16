@@ -47,11 +47,11 @@ int findUserByAccountWithRole(const char *account, int role);
 
 int findUserByPhone(const char *phone);
 
-void displayCurrentUserInfo();
+void displayCurrentUserInfo(int userRole);
 
-void changePassword();
+void changePassword(int userRole);
 
-void showUserMenu();
+void showUserMenu(int userRole);
 
 int getMerchantName(int merchantId, char *merchantName);
 

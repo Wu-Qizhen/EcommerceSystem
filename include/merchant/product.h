@@ -7,8 +7,6 @@
 #ifndef ECOMMERCESYSTEM_PRODUCT_H
 #define ECOMMERCESYSTEM_PRODUCT_H
 
-#include <time.h>
-
 #define MAX_PRODUCTS 1000
 #define MAX_NAME_LEN 50
 #define MAX_CATEGORY_LEN 50
@@ -29,21 +27,6 @@ typedef struct {
     int isDeleted;
 } Product;
 
-typedef struct {
-    int id;
-    int merchantId;
-    char name[MAX_NAME_LEN];
-    int type;
-    double discountRate;
-    double minAmount;
-    double discountAmount;
-
-    time_t startTime;
-    time_t endTime;
-    int isActive;
-    int isDeleted;
-} DiscountActivity;
-
 extern Product products[MAX_PRODUCTS];
 extern int productCount;
 extern Product *currentProduct;
@@ -56,13 +39,19 @@ int findProductById(int id);
 
 int findProductByName(int merchantId, const char *name);
 
-int findProductsByMerchantId(int merchantId, Product result[]);
+int findProductsByMerchantIdActive(int merchantId, Product result[]);
 
-int findProductsByMerchantIdLimitCount(int merchantId, Product result[], int maxResults);
+int findProductsByMerchantIdAll(int merchantId, Product result[]);
+
+int findProductsByMerchantIdActiveLimitCount(int merchantId, Product result[], int maxResults);
+
+// int searchProducts(const char *keyword, Product result[]);
+
+// int searchProductsLimitCount(const char *keyword, Product result[], int maxResults);
 
 int searchProducts(const char *keyword, Product result[], int maxResults);
 
-int searchProductsLimitCount(const char *keyword, Product result[], int maxResults);
+void displayProductInfo(const Product *product);
 
 void displayCurrentProductInfo();
 
@@ -70,8 +59,14 @@ void displayCurrentProductInfoById(int productId);
 
 void addProduct(int merchantId);
 
+void queryProducts(int merchantId);
+
+void manageProductStatus(int merchantId);
+
 int activeProduct(int productId);
 
 int unactiveProduct(int productId);
+
+int toggleProductStatus(int productId);
 
 #endif //ECOMMERCESYSTEM_PRODUCT_H

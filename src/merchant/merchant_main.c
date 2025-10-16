@@ -14,16 +14,17 @@
 #include "auth/reset.h"
 #include "utils/print_util.h"
 
-void showApp() {
-    printHeader("商家端");
-}
+/*void showApp() {
+    printPlusLine();
+    printTitle("商家端");
+}*/
 
 void showAuthMenu() {
-    printSubHeader("商家认证");
+    printHeader("商家认证");
     printf("1. 登录账号\n");
     printf("2. 注册账号\n");
     printf("3. 忘记密码\n");
-    printf("4. 退出系统\n");
+    printf("0. 退出系统\n");
     printSubLine();
     printInputHint();
 }
@@ -38,9 +39,9 @@ int main(void) {
 
     loadUsers();
 
-    int opt;
+    int opt = -1;
 
-    showApp();
+    /*showApp();*/
 
     do {
         showAuthMenu();
@@ -56,7 +57,7 @@ int main(void) {
             case 3:
                 forgetPassword();
                 break;
-            case 4:
+            case 0:
                 printSubLine();
                 printf("感谢使用，再见！\n");
                 break;
@@ -64,7 +65,7 @@ int main(void) {
                 printError("无效操作，请重新选择！");
                 break;
         }
-    } while (opt != 4);
+    } while (opt != 0);
 
     saveUsers();
     return 0;

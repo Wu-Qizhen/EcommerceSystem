@@ -49,7 +49,7 @@ int validatePhone(const char *phone) {
 
     for (int i = 0; i < size; i++) {
         if (!isdigit(phone[i])) {
-            printWarning("账号只能包含数字！");
+            printWarning("手机号只能包含数字！");
             return 0;
         }
     }

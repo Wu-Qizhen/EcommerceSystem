@@ -11,14 +11,16 @@
 
 #include "security/encryption.h"
 #include "security/validation.h"
+#include "utils/control_util.h"
 #include "utils/print_util.h"
 
 User users[MAX_USERS];
 int userCount = 0;
 User *currentUser = NULL;
+const char *USER_DATA_FILE = "D:\\MyProjects\\CPP\\EcommerceSystem\\data\\users.dat";
 
 void loadUsers() {
-    FILE *file = fopen("D:\\MyProjects\\CPP\\EcommerceSystem\\data\\users.dat", "rb");
+    FILE *file = fopen(USER_DATA_FILE, "rb");
     if (file == NULL) {
         printError("无法打开用户数据文件！");
         return;
@@ -34,7 +36,7 @@ void loadUsers() {
 }
 
 void saveUsers() {
-    FILE *file = fopen("D:\\MyProjects\\CPP\\EcommerceSystem\\data\\users.dat", "wb");
+    FILE *file = fopen(USER_DATA_FILE, "wb");
     if (file == NULL) {
         printError("无法保存用户数据！");
         return;
@@ -83,50 +85,87 @@ int findUserByPhone(const char *phone) {
     return -1;
 }
 
-void displayCurrentUserInfo() {
+void displayCurrentUserInfo(const int userRole) {
     if (currentUser == NULL) return;
 
-    printSubHeader("个人信息");
+    if (userRole == USER_ROLE_MERCHANT) {
+        printHeader("查看信息");
+        printf("商品概览 > 商家信息 > 查看信息\n");
+    } else {
+        printHeader("查看信息");
+        printf("商品概览 > 用户信息 > 查看信息\n"); // TODO
+    }
+
+    printSubLine();
     printf("姓名：%s\n", currentUser->name);
     printf("出生日期：%s\n", currentUser->birth);
     printf("账号：%s\n", currentUser->account);
     printf("手机号：%s\n", currentUser->phone);
+    printSubLine();
+    pauseScreen();
 }
 
-void changePassword() {
+void changePassword(const int userRole) {
     if (currentUser == NULL) return;
 
-    char oldPassword[MAX_PASSWORD_LEN];
-    char newPassword[MAX_PASSWORD_LEN];
+    if (userRole == USER_ROLE_MERCHANT) {
+        printHeader("修改密码");
+        printf("商品概览 > 商家信息 > 修改密码\n");
+    } else {
+        printHeader("修改密码");
+        printf("商品概览 > 用户信息 > 修改密码\n"); // TODO
+    }
 
-    printSubHeader("修改密码");
+    printSubLine();
+
+    char oldPassword[MAX_PASSWORD_LEN];
+    char password1[MAX_PASSWORD_LEN];
+    char password2[MAX_PASSWORD_LEN];
 
     printf("请输入当前密码：");
-    scanf("%s", oldPassword);
+    scanf_s("%s", oldPassword);
 
     if (strcmp(currentUser->password, oldPassword) != 0) {
         printError("当前密码错误！");
         return;
     }
 
+    int done = 0;
     do {
-        printf("请输入新密码（8-20 位，包含字母和数字）：\n");
-        scanf("%s", newPassword);
-    } while (!validatePassword(newPassword));
+        printf("请输入密码（8-20 位，包含字母和数字）：");
+        scanf_s("%s", password1);
 
-    strcpy(currentUser->password, newPassword);
+        printf("请再次输入密码：");
+        scanf_s("%s", password2);
+
+        if (strcmp(password1, password2) != 0) {
+            printWarning("两次输入的密码不一致！");
+            continue;
+        }
+
+        done = 1;
+    } while (!validatePassword(password1) || done == 0);
+
+    strcpy(currentUser->password, password1);
     saveUsers();
     printSuccess("密码修改成功！");
 }
 
-void showUserMenu() {
+void showUserMenu(const int userRole) {
     int choice;
     do {
-        printSubHeader("用户菜单");
+        if (userRole == USER_ROLE_MERCHANT) {
+            printHeader("商家信息");
+            printf("商品概览 > 商家信息\n");
+        } else {
+            printHeader("用户信息");
+            printf("商品概览 > 用户信息\n"); // TODO
+        }
+
+        printSubLine();
+        printf("0. 返回上级菜单\n");
         printf("1. 修改密码\n");
-        printf("2. 查看个人信息\n");
-        printf("3. 退出登录\n");
-        printf("4. 返回\n");
+        printf("2. 查看信息\n");
         printSubLine();
         printInputHint();
         scanf_s("%d", &choice);
@@ -134,21 +173,17 @@ void showUserMenu() {
 
         switch (choice) {
             case 1:
-                changePassword();
+                changePassword(userRole);
                 break;
             case 2:
-                displayCurrentUserInfo();
+                displayCurrentUserInfo(userRole);
                 break;
-            case 3:
-                currentUser = NULL;
-                printSuccess("已退出登录！");
-                break;
-            case 4:
+            case 0:
                 return;
             default:
                 printWarning("无效操作，请重新选择！");
         }
-    } while (choice != 3 && currentUser != NULL);
+    } while (choice != 0 && currentUser != NULL);
 }
 
 int getMerchantName(const int merchantId, char *merchantName) {

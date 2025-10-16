@@ -17,10 +17,12 @@ void loginUser(const int role) {
     char account[MAX_ACCOUNT_LEN];
     char password[MAX_PASSWORD_LEN];
 
-    printSubHeader("登录账号");
+    printHeader("登录账号");
+    printf_s("认证 > 登录账号\n");
+    printSubLine();
 
     printf("请输入账号：");
-    scanf("%s", account);
+    scanf_s("%s", account);
     /*fgets(account, MAX_ACCOUNT_LEN, stdin);
     account[strcspn(account, "\n")] = 0;*/
 
@@ -31,7 +33,7 @@ void loginUser(const int role) {
     }
 
     printf("请输入密码：");
-    scanf("%s", password);
+    scanf_s("%s", password);
     /*fgets(password,MAX_PASSWORD_LEN,stdin);
     password[strcspn(password, "\n")] = 0;*/
 

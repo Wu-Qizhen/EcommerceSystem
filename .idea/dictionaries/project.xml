@@ -8,6 +8,8 @@
       <w>strcspn</w>
       <w>strncpy</w>
       <w>strspn</w>
+      <w>strstr</w>
+      <w>wstr</w>
     </words>
   </dictionary>
 </component>

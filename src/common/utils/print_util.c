@@ -7,6 +7,7 @@
 #include "utils/print_util.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "utils/control_util.h"
 
@@ -23,7 +24,7 @@ void printSubHeader(char *title) {
 }
 
 void printTitle(char *title) {
-    const int totalLength = 40;
+    const int totalLength = 80;
     int titleLength = 0;
     const char *ptr = title;
 
@@ -43,12 +44,20 @@ void printTitle(char *title) {
     printf("\n");
 }
 
+void printPlusLine() {
+    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+}
+
+void printStarLine() {
+    printf("********************************************************************************\n");
+}
+
 void printLine() {
-    printf("========================================\n");
+    printf("================================================================================\n");
 }
 
 void printSubLine() {
-    printf("----------------------------------------\n");
+    printf("--------------------------------------------------------------------------------\n");
 }
 
 void printInputHint() {
@@ -56,22 +65,47 @@ void printInputHint() {
 }
 
 void printWarning(char *warning) {
-    printSubLine();
-    printf("Warning: %s\n", warning);
-    printSubLine();
+    printStarLine();
+    printf("⚠️ %s\n", warning);
+    printStarLine();
     pauseScreen();
 }
 
 void printError(char *err) {
-    printSubLine();
-    printf("Error: %s\n", err);
-    printSubLine();
+    printStarLine();
+    printf("❌ %s\n", err);
+    printStarLine();
     pauseScreen();
 }
 
 void printSuccess(char *msg) {
-    printSubLine();
-    printf("%s\n", msg);
-    printSubLine();
+    printPlusLine();
+    printf("✅ %s\n", msg);
+    printPlusLine();
     pauseScreen();
+}
+
+int getDisplayWidth(const char *str) {
+    int width = 0;
+    while (*str) {
+        if ((*str & 0xC0) != 0x80) {
+            if ((unsigned char) *str >= 0x80) {
+                // 中文字符
+                width += 2;
+            } else {
+                // 英文字符
+                width += 1;
+            }
+        }
+        str++;
+    }
+    return width;
+}
+
+void printPadded(const char *str, const int targetWidth) {
+    const int actualWidth = getDisplayWidth(str);
+    printf("%s", str);
+    for (int i = 0; i < targetWidth - actualWidth; i++) {
+        printf(" ");
+    }
 }

@@ -11,7 +11,8 @@
 
 void pauseScreen() {
     printf("按任意键继续……");
-    while (getchar() != '\n') {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {
     }
     getchar();
 }

@@ -13,6 +13,10 @@ void printSubHeader(char *title);
 
 void printTitle(char *title);
 
+void printPlusLine();
+
+void printStarLine();
+
 void printLine();
 
 void printSubLine();
@@ -24,5 +28,9 @@ void printWarning(char *warning);
 void printError(char *err);
 
 void printSuccess(char *msg);
+
+int getDisplayWidth(const char *str);
+
+void printPadded(const char *str, int targetWidth);
 
 #endif //ECOMMERCESYSTEM_PRINT_UTIL_H
