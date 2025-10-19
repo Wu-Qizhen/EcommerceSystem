@@ -242,7 +242,7 @@ void displayProductDetails(const Product *product) {
 
 void displayProductByMerchantId(Product result[], const int count) {
     if (count == 0) {
-        printf("现在还没有商品，请先添加商品！");
+        printf("现在还没有商品，请先添加商品！\n");
         return;
     }
 

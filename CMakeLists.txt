@@ -36,12 +36,14 @@ set(CLIENT_SOURCES
 set(MERCHANT_SOURCES
         src/merchant/merchant_menu.c
         src/client/client_menu.c
+        src/client/cart.c
+        src/client/order.c
         src/merchant/product.c
         src/merchant/discount.c
 )
 
 # 创建客户端可执行文件和数据目录
-add_executable(EcommerceClient
+#[[add_executable(EcommerceClient
         src/client/client_main.c
         ${COMMON_SOURCES}
         ${CLIENT_SOURCES}
@@ -49,10 +51,10 @@ add_executable(EcommerceClient
 
 add_custom_command(TARGET EcommerceClient POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/data
-)
+)]]
 
 # 创建商家端可执行文件和数据目录
-#[[add_executable(EcommerceMerchant
+add_executable(EcommerceMerchant
         src/merchant/merchant_main.c
         ${COMMON_SOURCES}
         ${MERCHANT_SOURCES}
@@ -60,4 +62,4 @@ add_custom_command(TARGET EcommerceClient POST_BUILD
 
 add_custom_command(TARGET EcommerceMerchant POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/data
-)]]
+)
